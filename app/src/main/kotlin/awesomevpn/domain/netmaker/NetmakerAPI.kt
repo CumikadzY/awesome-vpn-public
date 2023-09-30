@@ -15,7 +15,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONArray
-import org.json.JSONObject
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.io.File
@@ -44,6 +43,10 @@ class NetmakerAPI(
     val token: String,
     @Value("\${netmaker.api-url}")
     val apiUrl: String,
+    @Value("\${netmaker.gateway-name}")
+    val gatewayName: String,
+    @Value("\${netmaker.network}")
+    val network: String,
     @Value("\${netmaker.api-create-user-url}")
     val apiCreateUserUrl: String,
     @Value("\${static.working-directory}")
@@ -112,7 +115,7 @@ class NetmakerAPI(
 
     override suspend fun deleteUser(userId: Long) {
         val createRequest = Request.Builder()
-            .url("${apiUrl}/vpn/${userId}")
+            .url("${apiUrl}/${network}/${userId}")
             .delete("".toRequestBody())
             .build()
 
@@ -139,10 +142,10 @@ class NetmakerAPI(
     private suspend fun changeUserValue(
         prevName: String,
         newName: String = prevName,
-        enabled: Boolean = false
+        enabled: Boolean = true
     ): String {
         val updateNameRequest = Request.Builder()
-            .url("${apiUrl}/vpn/${prevName}")
+            .url("${apiUrl}/${network}/${prevName}")
             .put("{\"clientid\": \"$newName\", \"enabled\": $enabled}".toRequestBody(OkHttpUtils.JSON_TYPE))
             .build()
 
@@ -152,7 +155,7 @@ class NetmakerAPI(
     private suspend fun createUserByAPI() {
         val createRequest = Request.Builder()
             .url(apiCreateUserUrl)
-            .post("".toRequestBody())
+            .post("{\"gatewayId\": \"${gatewayName}\"}".toRequestBody())
             .build()
 
         OkHttpUtils.makeAsyncRequest(httpClient, createRequest) ?: throw NetmakerAPIException("Bad code")
@@ -199,7 +202,7 @@ class NetmakerAPI(
         if (!file.exists()) {
             withContext(Dispatchers.IO) { file.createNewFile() }
             val request = Request.Builder()
-                .url("${apiUrl}/vpn/${tgId}/file")
+                .url("${apiUrl}/${network}/${tgId}/file")
                 .get()
                 .build()
             val call = OkHttpUtils.makeAsyncRequestRaw(httpClient, request)

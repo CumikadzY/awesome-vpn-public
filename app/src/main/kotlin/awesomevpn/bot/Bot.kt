@@ -160,7 +160,7 @@ interface Bot: MessageSender {
         // Закидывайте все отправляемые фото и документы в папку "photoAndDocs"
         val sendPhoto = SendPhoto()
         val t = InputFile()
-        t.setMedia(File("static\\photoAndDocs\\$photo"))
+        t.setMedia(File("static/photoAndDocs/$photo"))
         sendPhoto.photo = t
         sendPhoto.chatId = chatId.toString()
         try {

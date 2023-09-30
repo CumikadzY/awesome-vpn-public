@@ -130,7 +130,7 @@ class UserService(
                         > TimeUnit.SECONDS.convert(29, TimeUnit.DAYS) + TimeUnit.SECONDS.convert(12, TimeUnit.HOURS)) {
                         if (user.balance < constants.cost) {
                             constants.messageSender?.sendMessage(
-                                "⌚ В ближайшие дни истекает подписка на бота, текущего баланса ${getUserById(user.id!!)?.balance} недостаточно для оплаты подписки (${constants.cost}) руб. Пополните баланс с помощью команды /pay",
+                                "⌚ В ближайшие дни истекает подписка на VPN, текущего баланса ${getUserById(user.id!!)?.balance} недостаточно для оплаты подписки (${constants.cost}) руб. Пополните баланс с помощью команды /pay",
                                 user.chatId
                             )
                         }

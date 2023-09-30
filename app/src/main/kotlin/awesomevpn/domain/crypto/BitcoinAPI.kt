@@ -9,14 +9,17 @@ import awesomevpn.domain.Constants
 import awesomevpn.domain.api.BlockCypherAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.bitcoinj.core.Address
-import org.bitcoinj.core.Coin
+import org.bitcoinj.base.Address
+import org.bitcoinj.base.BitcoinNetwork
+import org.bitcoinj.base.Coin
+import org.bitcoinj.base.ScriptType
 import org.bitcoinj.core.NetworkParameters
 import org.bitcoinj.kits.WalletAppKit
 import org.bitcoinj.params.MainNetParams
 import org.bitcoinj.script.Script
 import org.bitcoinj.utils.BriefLogFormatter
 import org.bitcoinj.wallet.DeterministicSeed
+import org.bitcoinj.wallet.KeyChainGroupStructure
 import org.bitcoinj.wallet.SendRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -38,6 +41,7 @@ class BitcoinAPI(
     private val cryptoInvoiceService: CryptoInvoiceService
 ) : CryptoGateway {
     private val walletAppKit: WalletAppKit
+    private val network: BitcoinNetwork = BitcoinNetwork.MAINNET
     private val params: NetworkParameters = MainNetParams.get()
     private val pendingTxs = hashSetOf<String>()
 
@@ -54,7 +58,7 @@ class BitcoinAPI(
 
         BriefLogFormatter.initWithSilentBitcoinJ()
 
-        walletAppKit = WalletAppKit(params, Script.ScriptType.P2WPKH, null, dirBitcoinj, "vpn")
+        walletAppKit = WalletAppKit(network, ScriptType.P2WPKH, KeyChainGroupStructure.BIP32, dirBitcoinj, "vpn")
 
         if (debug == "false") {
             walletAppKit.setAutoSave(true)
@@ -131,7 +135,7 @@ class BitcoinAPI(
 
     override fun getNewAddress(): String {
         val newKey = walletAppKit.wallet().freshReceiveKey()
-        val nnaddress = Address.fromKey(params, newKey, Script.ScriptType.P2WPKH)
+        val nnaddress = Address.fromKey(params, newKey, ScriptType.P2WPKH)
 
         walletAppKit.wallet().addWatchedAddress(nnaddress)
 

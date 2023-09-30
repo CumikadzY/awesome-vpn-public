@@ -34,7 +34,7 @@ data class User(
     var isBan: Boolean = false,
     var isRegistered: Boolean = false,
     var isActive: Boolean = false,
-    var subscriptionStart: LocalDateTime = LocalDateTime.MIN,
+    var subscriptionStart: LocalDateTime = LocalDateTime.now(),
     @Column(precision = 40, scale = 2)
     var balance: BigDecimal = BigDecimal.ZERO,
     @ElementCollection(fetch = FetchType.EAGER)
